@@ -58,6 +58,7 @@ public class SpringSecurityConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
 		http
+            .cors().and()
 			.csrf().disable()
 			.authorizeHttpRequests()
 			.requestMatchers("/", "/api/init/")
