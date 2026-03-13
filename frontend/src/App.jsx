@@ -4,6 +4,7 @@ import Home from './pages/Home';
 import Books from './pages/Books';
 import Login from './pages/Login';
 import AddBook from './pages/AddBook';
+import BookDetail from './pages/BookDetail';
 import { AuthProvider } from './context/AuthContext';
 import './App.css';
 
@@ -18,6 +19,7 @@ function App() {
             <Route path="/books" element={<Books />} />
             <Route path="/login" element={<Login />} />
             <Route path="/add-book" element={<AddBook />} />
+            <Route path="/books/:slug" element={<BookDetail />} />
           </Routes>
         </div>
       </Router>

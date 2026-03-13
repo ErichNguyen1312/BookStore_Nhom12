@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Container, Form, Button, Alert, Card, Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
@@ -13,15 +13,23 @@ function AddBook() {
   const [author, setAuthor] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState(0);
-  const [page, setPage] = useState(0);
   const [quantity, setQuantity] = useState(0);
-  const [bookCode, setBookCode] = useState('');
-  const [publisher, setPublisher] = useState('');
-  const [isbn, setIsbn] = useState('');
-  const [dimensions, setDimensions] = useState('');
-  const [translator, setTranslator] = useState('');
-  const [categoryId, setCategoryId] = useState(''); // Default empty initially
+  const [categoryId, setCategoryId] = useState(''); 
+  const [categories, setCategories] = useState([]);
   const [imageFile, setImageFile] = useState(null);
+
+  useEffect(() => {
+    // Fetch categories when component mounts
+    const fetchCategories = async () => {
+      try {
+        const response = await api.get('/categories/');
+        setCategories(response.data);
+      } catch (err) {
+        console.error('Error fetching categories:', err);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -37,18 +45,12 @@ function AddBook() {
     try {
       // 1. Prepare JSON Request
       const bookRequest = {
-        title,
+        bookTitle: title, // Match backend field name
         author,
         description,
         price: parseFloat(price),
-        page: parseInt(page),
         quantity: parseInt(quantity),
-        bookCode,
-        publisher,
-        isbn,
-        dimensions,
-        translator,
-        categoryId: parseInt(categoryId) || 1 // Fallback or could throw error
+        categoryId: parseInt(categoryId) || 1
       };
 
       // 2. Prepare FormData
@@ -109,18 +111,19 @@ function AddBook() {
                 </Form.Group>
                 
                 <Form.Group className="mb-3">
-                  <Form.Label>Book Code</Form.Label>
-                  <Form.Control type="text" value={bookCode} onChange={(e) => setBookCode(e.target.value)} required />
-                </Form.Group>
-                
-                <Form.Group className="mb-3">
-                  <Form.Label>ISBN</Form.Label>
-                  <Form.Control type="text" value={isbn} onChange={(e) => setIsbn(e.target.value)} required />
-                </Form.Group>
-
-                <Form.Group className="mb-3">
-                  <Form.Label>Category ID</Form.Label>
-                  <Form.Control type="number" value={categoryId} onChange={(e) => setCategoryId(e.target.value)} required />
+                  <Form.Label>Category</Form.Label>
+                  <Form.Select 
+                    value={categoryId} 
+                    onChange={(e) => setCategoryId(e.target.value)} 
+                    required
+                  >
+                    <option value="">Select a category</option>
+                    {categories.map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.categoryName}
+                      </option>
+                    ))}
+                  </Form.Select>
                 </Form.Group>
               </div>
 
@@ -133,21 +136,6 @@ function AddBook() {
                 <Form.Group className="mb-3">
                   <Form.Label>Quantity</Form.Label>
                   <Form.Control type="number" value={quantity} onChange={(e) => setQuantity(e.target.value)} required />
-                </Form.Group>
-
-                <Form.Group className="mb-3">
-                  <Form.Label>Pages</Form.Label>
-                  <Form.Control type="number" value={page} onChange={(e) => setPage(e.target.value)} required />
-                </Form.Group>
-
-                 <Form.Group className="mb-3">
-                  <Form.Label>Publisher</Form.Label>
-                  <Form.Control type="text" value={publisher} onChange={(e) => setPublisher(e.target.value)} />
-                </Form.Group>
-
-                <Form.Group className="mb-3">
-                  <Form.Label>Dimensions</Form.Label>
-                  <Form.Control type="text" value={dimensions} onChange={(e) => setDimensions(e.target.value)} />
                 </Form.Group>
               </div>
             </div>

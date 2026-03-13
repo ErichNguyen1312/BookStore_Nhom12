@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Card, Col, Row, Spinner, Alert } from 'react-bootstrap';
+import { Card, Col, Row, Spinner, Alert, Button } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import api from '../api/axios';
 
 function Books() {
@@ -52,13 +53,16 @@ function Books() {
                   alt={book.title}
                   style={{ height: '300px', objectFit: 'cover' }}
                 />
-                <Card.Body>
-                  <Card.Title>{book.title}</Card.Title>
-                  <Card.Text>
-                    <strong>Author:</strong> {book.author} <br />
-                    <strong>Category:</strong> {book.categoryName}
-                  </Card.Text>
-                </Card.Body>
+                  <Card.Body>
+                    <Card.Title>{book.bookTitle}</Card.Title>
+                    <Card.Text>
+                      <strong>Author:</strong> {book.author} <br />
+                      <strong>Category:</strong> {book.categoryName}
+                    </Card.Text>
+                    <Button as={Link} to={`/books/${book.slug}`} variant="outline-primary" size="sm">
+                      View Details
+                    </Button>
+                  </Card.Body>
               </Card>
             </Col>
           ))}
