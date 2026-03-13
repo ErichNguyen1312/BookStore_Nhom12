@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  # Backend Spring Boot
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: bookstore-backend
+    ports:
+      - "8084:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql_db:3306/library_project?createDatabaseIfNotExist=true&autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=123456789
+      - SPRING_PROFILES_ACTIVE=dev
+    depends_on:
+      mysql_db:
+        condition: service_healthy
+    networks:
+      - bookstore-network
+
+  # Database MySQL
+  mysql_db:
+    image: mysql:8.0
+    container_name: bookstore-db
+    ports:
+      - "3307:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456789
+      - MYSQL_DATABASE=library_project
+    volumes:
+      - mysql_data_bookstore:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+    networks:
+      - bookstore-network
+
+  # Frontend React
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: bookstore-frontend
+    ports:
+      - "3000:80"  # Nginx in container runs on 80, mapped to host port 3000
+    depends_on:
+      - backend
+    networks:
+      - bookstore-network
+
+volumes:
+  mysql_data_bookstore:
+
+networks:
+  bookstore-network:
+    driver: bridge
